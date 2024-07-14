@@ -13,6 +13,7 @@ type Game struct {
 	player           *Player
 	images           map[string]*ebiten.Image
 	camera           *Camera
+	cursor           *Cursor
 	decors           []*Decor
 }
 
@@ -22,6 +23,7 @@ func NewGame() *Game {
 			// load all the images once, up front
 			"player":  common.LoadImage("player.png"),
 			"grass-1": common.LoadImage("grass-1.png"),
+			"cursor":  common.LoadImage("cursor.png"),
 		},
 		lastUpdateCalled: time.Now(),
 		camera:           &Camera{},
@@ -44,6 +46,7 @@ func NewGame() *Game {
 			animation: NewAnimation(r.images["grass-1"], 4, 0.2, 16),
 		},
 	}
+	r.cursor = NewCursor(r)
 
 	return r
 }
@@ -67,6 +70,7 @@ func (r *Game) Update() error {
 	if inpututil.IsKeyJustPressed(ebiten.KeyF) {
 		ebiten.SetFullscreen(!ebiten.IsFullscreen())
 	}
+	r.cursor.Update()
 
 	return nil
 }
@@ -80,7 +84,7 @@ func (r *Game) Draw(screen *ebiten.Image) {
 	}
 
 	r.player.Draw(r.camera)
-
+	r.cursor.Draw(r.camera)
 }
 
 func (r *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
