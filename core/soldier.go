@@ -25,7 +25,9 @@ func NewSoldier(game *Game, x float64, y float64) *Soldier {
 		},
 		x:     x,
 		y:     y,
-		speed: 40,
+		tx:    x,
+		ty:    y,
+		speed: 30,
 		state: "idle",
 	}
 }
@@ -61,6 +63,7 @@ func (r *Soldier) Update(delta float64, game *Game) {
 		r.state = "walk"
 	}
 	r.animations[r.state].Update(delta, game)
+
 }
 
 func (r *Soldier) Draw(camera *Camera) {

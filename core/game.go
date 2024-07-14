@@ -16,6 +16,7 @@ type Game struct {
 	cursor           *Cursor
 	decors           []*Decor
 	soldiers         []*Soldier
+	selectedSoldier  *Soldier
 }
 
 func NewGame() *Game {
@@ -51,7 +52,10 @@ func NewGame() *Game {
 	}
 	r.cursor = NewCursor(r)
 	r.soldiers = []*Soldier{
-		NewSoldier(r, 20, 20),
+		NewSoldier(r, -120, 20),
+		NewSoldier(r, 20, 120),
+		NewSoldier(r, 120, 120),
+		NewSoldier(r, 20, 0),
 	}
 
 	return r
@@ -103,9 +107,7 @@ func (r *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return common.ScreenWidth * common.Scale, common.ScreenHeight * common.Scale
 }
 
-// func (r *Game) drawImage(screen *ebiten.Image, image *ebiten.Image, x float64, y float64) {
-// 	op := &ebiten.DrawImageOptions{}
-// 	op.GeoM.Translate(x, y)
-// 	op.GeoM.Scale(common.Scale, common.Scale)
-// 	screen.DrawImage(image, op)
-// }
+func (r *Game) MousePos() (float64, float64) {
+	x, y := ebiten.CursorPosition()
+	return float64(x/common.Scale) - 8, float64(y/common.Scale) - 8
+}

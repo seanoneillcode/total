@@ -1,7 +1,11 @@
 package core
 
 import (
+	"fmt"
+	"total/common"
+
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 type Player struct {
@@ -16,7 +20,7 @@ func NewPlayer(game *Game) *Player {
 	p := &Player{
 		y:         0,
 		x:         0,
-		speed:     40,
+		speed:     30,
 		animation: NewAnimation(game.images["player"], 4, 0.2, 16),
 	}
 	return p
@@ -37,6 +41,31 @@ func (r *Player) Update(delta float64, game *Game) {
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) || ebiten.IsKeyPressed(ebiten.KeyS) {
 		r.y = r.y + (delta * r.speed)
+	}
+	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButton0) {
+		fmt.Println("pressed 0")
+		mx, my := game.MousePos()
+		fmt.Println("pressed 0 ", mx, " ", my)
+
+		if game.selectedSoldier == nil {
+			for _, s := range game.soldiers {
+				if common.Overlap(s.x, s.y, 16, mx, my, 16) {
+					fmt.Println("clicked soldier")
+					game.selectedSoldier = s
+				}
+			}
+		} else {
+			game.selectedSoldier.tx = mx
+			game.selectedSoldier.ty = my
+		}
+	}
+	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButton1) {
+		fmt.Println("pressed 1")
+		game.selectedSoldier = nil
+	}
+	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButton2) {
+		fmt.Println("pressed 2")
+		game.selectedSoldier = nil
 	}
 }
 
