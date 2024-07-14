@@ -15,15 +15,18 @@ type Game struct {
 	camera           *Camera
 	cursor           *Cursor
 	decors           []*Decor
+	soldiers         []*Soldier
 }
 
 func NewGame() *Game {
 	r := &Game{
 		images: map[string]*ebiten.Image{
 			// load all the images once, up front
-			"player":  common.LoadImage("player.png"),
-			"grass-1": common.LoadImage("grass-1.png"),
-			"cursor":  common.LoadImage("cursor.png"),
+			"player":       common.LoadImage("player.png"),
+			"grass-1":      common.LoadImage("grass-1.png"),
+			"cursor":       common.LoadImage("cursor.png"),
+			"soldier-idle": common.LoadImage("soldier-idle.png"),
+			"soldier-walk": common.LoadImage("soldier-walk.png"),
 		},
 		lastUpdateCalled: time.Now(),
 		camera:           &Camera{},
@@ -47,6 +50,9 @@ func NewGame() *Game {
 		},
 	}
 	r.cursor = NewCursor(r)
+	r.soldiers = []*Soldier{
+		NewSoldier(r, 20, 20),
+	}
 
 	return r
 }
@@ -62,6 +68,9 @@ func (r *Game) Update() error {
 
 	for _, d := range r.decors {
 		d.animation.Update(delta, r)
+	}
+	for _, s := range r.soldiers {
+		s.Update(delta, r)
 	}
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
@@ -81,6 +90,9 @@ func (r *Game) Draw(screen *ebiten.Image) {
 
 	for _, d := range r.decors {
 		d.Draw(r.camera)
+	}
+	for _, s := range r.soldiers {
+		s.Draw(r.camera)
 	}
 
 	r.player.Draw(r.camera)
