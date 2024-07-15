@@ -68,7 +68,7 @@ func drawText(screen *ebiten.Image, str string, ox, oy int, shadow bool) {
 			op.GeoM.Reset()
 			op.GeoM.Translate(float64(ox), float64(oy))
 			op.GeoM.Translate(float64(x), float64(y))
-			op.GeoM.Scale(Scale, Scale)
+			op.GeoM.Scale(TextScale, TextScale)
 			screen.DrawImage(s, op)
 			x += cw - 4
 		}

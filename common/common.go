@@ -16,6 +16,7 @@ const (
 	ScreenWidth  = 360
 	ScreenHeight = 240
 	Scale        = 4
+	TextScale    = 2
 )
 
 var NormalEscapeError = errors.New("normal escape termination")

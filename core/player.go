@@ -45,18 +45,18 @@ func (r *Player) Update(delta float64, game *Game) {
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButton0) {
 		fmt.Println("pressed 0")
 		mx, my := game.MousePos()
-		fmt.Println("pressed 0 ", mx, " ", my)
+		wx, wy := game.ScreenPosToWorldPos(mx, my)
 
 		if game.selectedSoldier == nil {
 			for _, s := range game.soldiers {
-				if common.Overlap(s.x, s.y, 16, mx, my, 16) {
+				if common.Overlap(s.x, s.y, 16, wx+4, wy+4, 1) {
 					fmt.Println("clicked soldier")
 					game.selectedSoldier = s
 				}
 			}
 		} else {
-			game.selectedSoldier.tx = mx
-			game.selectedSoldier.ty = my
+			game.selectedSoldier.tx = wx
+			game.selectedSoldier.ty = wy
 		}
 	}
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButton1) {

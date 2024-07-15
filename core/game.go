@@ -17,6 +17,7 @@ type Game struct {
 	decors           []*Decor
 	soldiers         []*Soldier
 	selectedSoldier  *Soldier
+	selection        *Decor
 }
 
 func NewGame() *Game {
@@ -26,8 +27,10 @@ func NewGame() *Game {
 			"player":       common.LoadImage("player.png"),
 			"grass-1":      common.LoadImage("grass-1.png"),
 			"cursor":       common.LoadImage("cursor.png"),
+			"cursor-move":  common.LoadImage("cursor-move.png"),
 			"soldier-idle": common.LoadImage("soldier-idle.png"),
 			"soldier-walk": common.LoadImage("soldier-walk.png"),
+			"selection":    common.LoadImage("selection.png"),
 		},
 		lastUpdateCalled: time.Now(),
 		camera:           &Camera{},
@@ -52,10 +55,12 @@ func NewGame() *Game {
 	}
 	r.cursor = NewCursor(r)
 	r.soldiers = []*Soldier{
-		NewSoldier(r, -120, 20),
-		NewSoldier(r, 20, 120),
-		NewSoldier(r, 120, 120),
-		NewSoldier(r, 20, 0),
+		NewSoldier(r, 20, 40),
+	}
+	r.selection = &Decor{
+		x:         0,
+		y:         0,
+		animation: NewAnimation(r.images["selection"], 2, 0.2, 16),
 	}
 
 	return r
@@ -83,7 +88,12 @@ func (r *Game) Update() error {
 	if inpututil.IsKeyJustPressed(ebiten.KeyF) {
 		ebiten.SetFullscreen(!ebiten.IsFullscreen())
 	}
-	r.cursor.Update()
+	r.cursor.Update(delta, r)
+	if r.selectedSoldier != nil {
+		r.selection.x = r.selectedSoldier.x
+		r.selection.y = r.selectedSoldier.y + 6
+		r.selection.animation.Update(delta, r)
+	}
 
 	return nil
 }
@@ -94,6 +104,9 @@ func (r *Game) Draw(screen *ebiten.Image) {
 
 	for _, d := range r.decors {
 		d.Draw(r.camera)
+	}
+	if r.selectedSoldier != nil {
+		r.selection.Draw(r.camera)
 	}
 	for _, s := range r.soldiers {
 		s.Draw(r.camera)
@@ -110,4 +123,8 @@ func (r *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 func (r *Game) MousePos() (float64, float64) {
 	x, y := ebiten.CursorPosition()
 	return float64(x/common.Scale) - 8, float64(y/common.Scale) - 8
+}
+
+func (r *Game) ScreenPosToWorldPos(x float64, y float64) (float64, float64) {
+	return x + r.camera.x - HalfScreenWidth, y + r.camera.y - HalfScreenHeight
 }

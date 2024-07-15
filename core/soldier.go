@@ -21,7 +21,7 @@ func NewSoldier(game *Game, x float64, y float64) *Soldier {
 	return &Soldier{
 		animations: map[string]*Animation{
 			"idle": NewAnimation(game.images["soldier-idle"], 4, 0.2, 16),
-			"walk": NewAnimation(game.images["soldier-walk"], 4, 0.2, 16),
+			"walk": NewAnimation(game.images["soldier-walk"], 4, 0.1, 16),
 		},
 		x:     x,
 		y:     y,
