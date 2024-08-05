@@ -47,25 +47,35 @@ func (r *Player) Update(delta float64, game *Game) {
 		mx, my := game.MousePos()
 		wx, wy := game.ScreenPosToWorldPos(mx, my)
 
-		if game.selectedSoldier == nil {
-			for _, s := range game.soldiers {
-				if common.Overlap(s.x, s.y, 16, wx+4, wy+4, 1) {
-					fmt.Println("clicked soldier")
-					game.selectedSoldier = s
+		if game.selectedUnit == nil {
+			for _, u := range game.units {
+				for _, s := range u.soldiers {
+					if common.Overlap(s.x, s.y, 16, wx+4, wy+4, 1) {
+						fmt.Println("clicked unit")
+
+						game.selectedUnit = u
+						game.selectedUnit.GetSelected()
+					}
 				}
 			}
 		} else {
-			game.selectedSoldier.tx = wx
-			game.selectedSoldier.ty = wy
+			game.selectedUnit.MoveTo(wx, wy)
 		}
 	}
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButton1) {
 		fmt.Println("pressed 1")
-		game.selectedSoldier = nil
+		if game.selectedUnit != nil {
+			game.selectedUnit.GetDeSelected()
+		}
+		game.selectedUnit = nil
+
 	}
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButton2) {
 		fmt.Println("pressed 2")
-		game.selectedSoldier = nil
+		if game.selectedUnit != nil {
+			game.selectedUnit.GetDeSelected()
+		}
+		game.selectedUnit = nil
 	}
 }
 
@@ -78,5 +88,5 @@ func (r *Player) Draw(camera *Camera) {
 	if r.isFlip {
 		op.GeoM.Translate(16, 0)
 	}
-	camera.DrawImage(r.animation.GetImage(), op)
+	camera.DrawImage(r.animation.GetImage(), op, midgroundLayer)
 }

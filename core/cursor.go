@@ -32,7 +32,7 @@ func (r *Cursor) Update(delta float64, game *Game) {
 	r.x = cx
 	r.y = cy
 	r.state = "cursor"
-	if game.selectedSoldier != nil {
+	if game.selectedUnit != nil {
 		r.state = "cursor-move"
 	}
 	r.images[r.state].Update(delta, game)
@@ -42,5 +42,5 @@ func (r *Cursor) Draw(camera *Camera) {
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(float64(r.x/common.Scale)-8, float64(r.y/common.Scale)-8)
 	op.GeoM.Scale(common.Scale, common.Scale)
-	camera.screen.DrawImage(r.images[r.state].GetImage(), op)
+	camera.DrawUI(r.images[r.state].GetImage(), op, forgroundLayer)
 }

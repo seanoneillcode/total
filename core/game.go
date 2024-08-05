@@ -15,9 +15,8 @@ type Game struct {
 	camera           *Camera
 	cursor           *Cursor
 	decors           []*Decor
-	soldiers         []*Soldier
-	selectedSoldier  *Soldier
-	selection        *Decor
+	units            []*Unit
+	selectedUnit     *Unit
 }
 
 func NewGame() *Game {
@@ -33,7 +32,7 @@ func NewGame() *Game {
 			"selection":    common.LoadImage("selection.png"),
 		},
 		lastUpdateCalled: time.Now(),
-		camera:           &Camera{},
+		camera:           NewCamera(),
 	}
 	r.player = NewPlayer(r)
 	r.decors = []*Decor{
@@ -54,13 +53,19 @@ func NewGame() *Game {
 		},
 	}
 	r.cursor = NewCursor(r)
-	r.soldiers = []*Soldier{
-		NewSoldier(r, 20, 40),
+	r.units = []*Unit{
+		NewUnit(),
+		NewUnit(),
+		NewUnit(),
 	}
-	r.selection = &Decor{
-		x:         0,
-		y:         0,
-		animation: NewAnimation(r.images["selection"], 2, 0.2, 16),
+	for i := 0; i < 8; i++ {
+		r.units[0].AddSoldier(NewSoldier(r, float64(i)*16, 0))
+	}
+	for i := 0; i < 18; i++ {
+		r.units[1].AddSoldier(NewSoldier(r, float64(i)*16, 0))
+	}
+	for i := 0; i < 4; i++ {
+		r.units[2].AddSoldier(NewSoldier(r, float64(i)*16, 0))
 	}
 
 	return r
@@ -78,8 +83,8 @@ func (r *Game) Update() error {
 	for _, d := range r.decors {
 		d.animation.Update(delta, r)
 	}
-	for _, s := range r.soldiers {
-		s.Update(delta, r)
+	for _, u := range r.units {
+		u.Update(delta, r)
 	}
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
@@ -89,11 +94,6 @@ func (r *Game) Update() error {
 		ebiten.SetFullscreen(!ebiten.IsFullscreen())
 	}
 	r.cursor.Update(delta, r)
-	if r.selectedSoldier != nil {
-		r.selection.x = r.selectedSoldier.x
-		r.selection.y = r.selectedSoldier.y + 6
-		r.selection.animation.Update(delta, r)
-	}
 
 	return nil
 }
@@ -105,15 +105,14 @@ func (r *Game) Draw(screen *ebiten.Image) {
 	for _, d := range r.decors {
 		d.Draw(r.camera)
 	}
-	if r.selectedSoldier != nil {
-		r.selection.Draw(r.camera)
-	}
-	for _, s := range r.soldiers {
-		s.Draw(r.camera)
+	for _, u := range r.units {
+		u.Draw(r.camera)
 	}
 
 	r.player.Draw(r.camera)
 	r.cursor.Draw(r.camera)
+
+	r.camera.Draw()
 }
 
 func (r *Game) Layout(outsideWidth, outsideHeight int) (int, int) {

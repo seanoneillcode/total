@@ -2,6 +2,7 @@ package core
 
 import (
 	"math"
+	"total/common"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -15,20 +16,23 @@ type Soldier struct {
 	isFlip     bool
 	animations map[string]*Animation
 	state      string
+	isSelected bool
+	selection  *Animation
 }
 
 func NewSoldier(game *Game, x float64, y float64) *Soldier {
 	return &Soldier{
 		animations: map[string]*Animation{
 			"idle": NewAnimation(game.images["soldier-idle"], 4, 0.2, 16),
-			"walk": NewAnimation(game.images["soldier-walk"], 4, 0.1, 16),
+			"walk": NewAnimation(game.images["soldier-walk"], 4, 0.2, 16),
 		},
-		x:     x,
-		y:     y,
-		tx:    x,
-		ty:    y,
-		speed: 30,
-		state: "idle",
+		selection: NewAnimation(game.images["selection"], 2, 0.2, 16),
+		x:         x,
+		y:         y,
+		tx:        x,
+		ty:        y,
+		speed:     20,
+		state:     "idle",
 	}
 }
 
@@ -40,23 +44,25 @@ func (r *Soldier) Update(delta float64, game *Game) {
 	if math.Abs(r.ty-r.y) < (2 * r.speed * delta) {
 		r.y = r.ty
 	}
-	if r.x < r.tx {
-		r.x = r.x + r.speed*delta
+
+	var dirx float64
+	var diry float64
+	if r.x != r.tx || r.y != r.ty {
+		dirx = r.tx - r.x
+		diry = r.ty - r.y
 		isMoving = true
+
+		nx, ny := common.Normalize(dirx, diry)
+		r.x = r.x + (r.speed * delta * nx)
+		r.y = r.y + (r.speed * delta * ny)
+	}
+
+	if r.x < r.tx {
 		r.isFlip = false
 	}
+
 	if r.x > r.tx {
-		r.x = r.x - r.speed*delta
-		isMoving = true
 		r.isFlip = true
-	}
-	if r.y < r.ty {
-		r.y = r.y + r.speed*delta
-		isMoving = true
-	}
-	if r.y > r.ty {
-		r.y = r.y - r.speed*delta
-		isMoving = true
 	}
 	r.state = "idle"
 	if isMoving {
@@ -76,5 +82,17 @@ func (r *Soldier) Draw(camera *Camera) {
 		op.GeoM.Translate(16, 0)
 	}
 	animation := r.animations[r.state]
-	camera.DrawImage(animation.GetImage(), op)
+	camera.DrawImage(animation.GetImage(), op, midgroundLayer)
+
+	if r.isSelected {
+		op = &ebiten.DrawImageOptions{}
+		op.GeoM.Translate(r.x, r.y+4)
+		op.ColorScale.ScaleAlpha(0.5)
+		camera.DrawImage(r.selection.GetImage(), op, midgroundLayer-50)
+	}
+}
+
+func (r *Soldier) SetTarget(x, y float64) {
+	r.tx = x
+	r.ty = y
 }

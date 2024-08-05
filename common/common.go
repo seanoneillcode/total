@@ -6,6 +6,7 @@ import (
 	"image"
 	"io/ioutil"
 	"log"
+	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
 
@@ -45,4 +46,16 @@ func Overlap(x1, y1, s1, x2, y2, s2 float64) bool {
 		return false
 	}
 	return true
+}
+
+func Normalize(x float64, y float64) (float64, float64) {
+	var nx, ny float64
+	norm2 := x*x + y*y
+	if norm2 == 0 {
+		return nx, ny
+	}
+	ratio := (1 / math.Sqrt(norm2))
+	nx = x * ratio
+	ny = y * ratio
+	return nx, ny
 }
