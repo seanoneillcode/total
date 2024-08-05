@@ -2,6 +2,7 @@ package core
 
 import (
 	"math"
+	"math/rand"
 	"total/common"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -23,25 +24,30 @@ type Soldier struct {
 func NewSoldier(game *Game, x float64, y float64) *Soldier {
 	return &Soldier{
 		animations: map[string]*Animation{
-			"idle": NewAnimation(game.images["soldier-idle"], 4, 0.2, 16),
-			"walk": NewAnimation(game.images["soldier-walk"], 4, 0.2, 16),
+			"idle": NewAnimation(game.images["soldier-idle"], 4, 0.2, 16, false),
+			"walk": NewAnimation(game.images["soldier-walk"], 4, 0.2, 16, false),
+			"die":  NewAnimation(game.images["soldier-die"], 4, 0.2, 16, true),
 		},
-		selection: NewAnimation(game.images["selection"], 2, 0.2, 16),
+		selection: NewAnimation(game.images["selection"], 2, 0.2, 16, false),
 		x:         x,
 		y:         y,
 		tx:        x,
 		ty:        y,
-		speed:     20,
+		speed:     0.5,
 		state:     "idle",
 	}
 }
 
 func (r *Soldier) Update(delta float64, game *Game) {
+	if r.state == "die" {
+		r.animations[r.state].Update(delta, game)
+		return
+	}
 	isMoving := false
-	if math.Abs(r.tx-r.x) < (2 * r.speed * delta) {
+	if math.Abs(r.tx-r.x) < (2 * r.speed) {
 		r.x = r.tx
 	}
-	if math.Abs(r.ty-r.y) < (2 * r.speed * delta) {
+	if math.Abs(r.ty-r.y) < (2 * r.speed) {
 		r.y = r.ty
 	}
 
@@ -53,8 +59,8 @@ func (r *Soldier) Update(delta float64, game *Game) {
 		isMoving = true
 
 		nx, ny := common.Normalize(dirx, diry)
-		r.x = r.x + (r.speed * delta * nx)
-		r.y = r.y + (r.speed * delta * ny)
+		r.x = r.x + (r.speed * nx)
+		r.y = r.y + (r.speed * ny)
 	}
 
 	if r.x < r.tx {
@@ -69,10 +75,12 @@ func (r *Soldier) Update(delta float64, game *Game) {
 		r.state = "walk"
 	}
 	r.animations[r.state].Update(delta, game)
-
 }
 
 func (r *Soldier) Draw(camera *Camera) {
+	if r.state == "die" {
+		return
+	}
 	camera.DrawCircle(r.x+8, r.y+14, 5)
 	op := &ebiten.DrawImageOptions{}
 	if r.isFlip {
@@ -96,4 +104,25 @@ func (r *Soldier) Draw(camera *Camera) {
 func (r *Soldier) SetTarget(x, y float64) {
 	r.tx = x
 	r.ty = y
+}
+
+func (r *Soldier) Die(game *Game) {
+	if r.state == "die" {
+		return
+	}
+	r.state = "die"
+
+	bloodImage := []string{"blood-1", "blood-2"}[rand.Intn(2)]
+	game.AddDecor(&Decor{
+		x:         r.x,
+		y:         r.y,
+		z:         forgroundLayer + 10,
+		animation: NewAnimation(game.images[bloodImage], 7, 0.1, 16, true),
+	})
+	game.AddDecor(&Decor{
+		x:         r.x,
+		y:         r.y,
+		z:         midgroundLayer,
+		animation: NewAnimation(game.images["soldier-die"], 4, 0.2, 16, true),
+	})
 }

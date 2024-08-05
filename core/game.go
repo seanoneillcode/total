@@ -2,6 +2,7 @@ package core
 
 import (
 	"image/color"
+	"math/rand"
 	"time"
 	"total/common"
 
@@ -25,33 +26,33 @@ func NewGame() *Game {
 		images: map[string]*ebiten.Image{
 			// load all the images once, up front
 			"player":       common.LoadImage("player.png"),
+			"player-walk":  common.LoadImage("player-walk.png"),
+			"player-die":   common.LoadImage("player-die.png"),
 			"grass-1":      common.LoadImage("grass-1.png"),
+			"grass-2":      common.LoadImage("grass-2.png"),
+			"grass-3":      common.LoadImage("grass-3.png"),
+			"grass-4":      common.LoadImage("grass-4.png"),
+			"blood-1":      common.LoadImage("blood-1.png"),
+			"blood-2":      common.LoadImage("blood-2.png"),
 			"cursor":       common.LoadImage("cursor.png"),
 			"cursor-move":  common.LoadImage("cursor-move.png"),
 			"soldier-idle": common.LoadImage("soldier-idle.png"),
 			"soldier-walk": common.LoadImage("soldier-walk.png"),
+			"soldier-die":  common.LoadImage("soldier-die.png"),
 			"selection":    common.LoadImage("selection.png"),
 		},
 		lastUpdateCalled: time.Now(),
 		camera:           NewCamera(),
 	}
 	r.player = NewPlayer(r)
-	r.decors = []*Decor{
-		{
-			x:         0,
-			y:         0,
-			animation: NewAnimation(r.images["grass-1"], 4, 0.2, 16),
-		},
-		{
-			x:         64,
-			y:         0,
-			animation: NewAnimation(r.images["grass-1"], 4, 0.2, 16),
-		},
-		{
-			x:         0,
-			y:         32,
-			animation: NewAnimation(r.images["grass-1"], 4, 0.2, 16),
-		},
+	r.decors = []*Decor{}
+	grassImageNames := []string{"grass-1", "grass-2", "grass-3", "grass-4"}
+	for i := 0; i < 64; i++ {
+		r.decors = append(r.decors, &Decor{
+			x:         float64(rand.Intn(common.ScreenWidth*2) - common.ScreenWidth),
+			y:         float64(rand.Intn(common.ScreenHeight*2) - common.ScreenHeight),
+			animation: NewAnimation(r.images[grassImageNames[rand.Intn(4)]], 4, 0.2, 16, false),
+		})
 	}
 	r.cursor = NewCursor(r)
 	r.units = []*Unit{
@@ -139,4 +140,8 @@ func (r *Game) MousePos() (float64, float64) {
 
 func (r *Game) ScreenPosToWorldPos(x float64, y float64) (float64, float64) {
 	return x + r.camera.x - HalfScreenWidth, y + r.camera.y - HalfScreenHeight
+}
+
+func (r *Game) AddDecor(decor *Decor) {
+	r.decors = append(r.decors, decor)
 }

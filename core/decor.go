@@ -12,5 +12,5 @@ type Decor struct {
 func (r *Decor) Draw(camera *Camera) {
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(r.x, r.y)
-	camera.DrawImage(r.animation.GetImage(), op, backgroundLayer)
+	camera.DrawImage(r.animation.GetImage(), op, r.z)
 }

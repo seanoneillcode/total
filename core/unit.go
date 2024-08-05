@@ -20,7 +20,7 @@ type Unit struct {
 
 func NewUnit(game *Game) *Unit {
 	return &Unit{
-		targetMarker: NewAnimation(game.images["selection"], 2, 0.2, 16),
+		targetMarker: NewAnimation(game.images["selection"], 2, 0.2, 16, false),
 		soldiers:     []*Soldier{},
 	}
 }
@@ -74,11 +74,24 @@ func (u *Unit) MoveTo(x, y float64) {
 }
 
 func (u *Unit) Update(delta float64, game *Game) {
+	needsClearing := false
 	for _, s := range u.soldiers {
 		s.Update(delta, game)
+		if s.state == "die" {
+			needsClearing = true
+		}
 	}
 	if u.selectionTimer > 0 {
 		u.selectionTimer = u.selectionTimer - delta
+	}
+	if needsClearing {
+		newSlice := []*Soldier{}
+		for _, s := range u.soldiers {
+			if s.state != "die" {
+				newSlice = append(newSlice, s)
+			}
+		}
+		u.soldiers = newSlice
 	}
 }
 

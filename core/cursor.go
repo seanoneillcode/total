@@ -20,8 +20,8 @@ func NewCursor(game *Game) *Cursor {
 		x: cx,
 		y: cy,
 		images: map[string]*Animation{
-			"cursor":      NewAnimation(game.images["cursor"], 1, 1, 16),
-			"cursor-move": NewAnimation(game.images["cursor-move"], 4, 0.1, 16),
+			"cursor":      NewAnimation(game.images["cursor"], 1, 1, 16, false),
+			"cursor-move": NewAnimation(game.images["cursor-move"], 4, 0.1, 16, false),
 		},
 		state: "cursor",
 	}
