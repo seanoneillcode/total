@@ -1,6 +1,7 @@
 package core
 
 import (
+	"image/color"
 	"time"
 	"total/common"
 
@@ -54,19 +55,23 @@ func NewGame() *Game {
 	}
 	r.cursor = NewCursor(r)
 	r.units = []*Unit{
-		NewUnit(),
-		NewUnit(),
-		NewUnit(),
+		NewUnit(r),
+		NewUnit(r),
+		NewUnit(r),
 	}
 	for i := 0; i < 8; i++ {
-		r.units[0].AddSoldier(NewSoldier(r, float64(i)*16, 0))
+		r.units[0].AddSoldier(NewSoldier(r, 0, 0))
 	}
 	for i := 0; i < 18; i++ {
-		r.units[1].AddSoldier(NewSoldier(r, float64(i)*16, 0))
+		r.units[1].AddSoldier(NewSoldier(r, 0, 0))
 	}
 	for i := 0; i < 4; i++ {
-		r.units[2].AddSoldier(NewSoldier(r, float64(i)*16, 0))
+		r.units[2].AddSoldier(NewSoldier(r, 0, 0))
 	}
+
+	r.units[0].MoveTo(-40, -60)
+	r.units[1].MoveTo(-60, 40)
+	r.units[2].MoveTo(30, 30)
 
 	return r
 }
@@ -99,6 +104,14 @@ func (r *Game) Update() error {
 }
 
 func (r *Game) Draw(screen *ebiten.Image) {
+	// 32, 74, 26
+	backgroundColor := color.RGBA{
+		R: 32,
+		G: 74,
+		B: 26,
+		A: 255,
+	}
+	screen.Fill(backgroundColor)
 	r.camera.screen = screen
 	common.DrawText(screen, "hello", 60, 120)
 

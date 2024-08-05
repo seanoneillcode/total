@@ -1,10 +1,12 @@
 package core
 
 import (
+	"image/color"
 	"sort"
 	"total/common"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 const HalfScreenWidth = common.ScreenWidth / 2
@@ -43,6 +45,19 @@ func (r *Camera) DrawImage(image *ebiten.Image, op *ebiten.DrawImageOptions, z i
 
 func (r *Camera) DrawUI(image *ebiten.Image, op *ebiten.DrawImageOptions, z int) {
 	r.uiDrawCalls = append(r.uiDrawCalls, drawCall{image: image, op: op, z: z})
+}
+
+func (r *Camera) DrawCircle(x, y, rad float64) {
+	xa := x - r.x + HalfScreenWidth
+	ya := y - r.y + HalfScreenHeight
+	vector.DrawFilledCircle(
+		r.screen,
+		float32(xa*common.Scale),
+		float32(ya*common.Scale),
+		float32(rad*common.Scale),
+		color.RGBA{
+			R: 0, G: 0, B: 0, A: 80,
+		}, false)
 }
 
 func (r *Camera) yzSort(i, j int) bool {

@@ -14,13 +14,13 @@ type Unit struct {
 	y              float64
 	soldiers       []*Soldier
 	unitTemplate   *UnitTemplate
-	targetMarker   *ebiten.Image
+	targetMarker   *Animation
 	selectionTimer float64
 }
 
-func NewUnit() *Unit {
+func NewUnit(game *Game) *Unit {
 	return &Unit{
-		targetMarker: common.LoadImage("cursor.png"),
+		targetMarker: NewAnimation(game.images["selection"], 2, 0.2, 16),
 		soldiers:     []*Soldier{},
 	}
 }
@@ -83,7 +83,6 @@ func (u *Unit) Update(delta float64, game *Game) {
 }
 
 func (u *Unit) Draw(camera *Camera) {
-
 	for _, s := range u.soldiers {
 		s.Draw(camera)
 		u.drawSelection(camera, s.tx, s.ty)
@@ -101,7 +100,7 @@ func (u *Unit) drawSelection(camera *Camera, x float64, y float64) {
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(x, y)
 	op.ColorScale.ScaleAlpha(float32(u.selectionTimer) / SelectionTime)
-	camera.DrawImage(u.targetMarker, op, midgroundLayer-50)
+	camera.DrawImage(u.targetMarker.GetImage(), op, midgroundLayer-50)
 }
 
 func (u *Unit) GetSelected() {

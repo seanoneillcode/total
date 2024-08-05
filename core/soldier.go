@@ -73,6 +73,7 @@ func (r *Soldier) Update(delta float64, game *Game) {
 }
 
 func (r *Soldier) Draw(camera *Camera) {
+	camera.DrawCircle(r.x+8, r.y+14, 5)
 	op := &ebiten.DrawImageOptions{}
 	if r.isFlip {
 		op.GeoM.Scale(-1, 1)

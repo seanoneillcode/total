@@ -48,6 +48,7 @@ func (r *Player) Update(delta float64, game *Game) {
 		wx, wy := game.ScreenPosToWorldPos(mx, my)
 
 		if game.selectedUnit == nil {
+		exitSelection:
 			for _, u := range game.units {
 				for _, s := range u.soldiers {
 					if common.Overlap(s.x, s.y, 16, wx+4, wy+4, 1) {
@@ -55,6 +56,7 @@ func (r *Player) Update(delta float64, game *Game) {
 
 						game.selectedUnit = u
 						game.selectedUnit.GetSelected()
+						break exitSelection
 					}
 				}
 			}
@@ -80,6 +82,7 @@ func (r *Player) Update(delta float64, game *Game) {
 }
 
 func (r *Player) Draw(camera *Camera) {
+	camera.DrawCircle(r.x+8, r.y+14, 6)
 	op := &ebiten.DrawImageOptions{}
 	if r.isFlip {
 		op.GeoM.Scale(-1, 1)
