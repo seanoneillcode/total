@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"total/common"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -43,7 +42,6 @@ func (r *Player) Update(delta float64, game *Game) {
 		r.y = r.y + (r.speed)
 	}
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButton0) {
-		fmt.Println("pressed 0")
 		mx, my := game.MousePos()
 		wx, wy := game.ScreenPosToWorldPos(mx, my)
 
@@ -51,9 +49,7 @@ func (r *Player) Update(delta float64, game *Game) {
 		exitSelection:
 			for _, u := range game.units {
 				for _, s := range u.soldiers {
-					if common.Overlap(s.x+2, s.y+2, 10, wx+4, wy+4, 1) {
-						fmt.Println("clicked unit")
-
+					if common.Overlap(s.x+1, s.y+1, 12, wx+3, wy+3, 2) {
 						game.selectedUnit = u
 						game.selectedUnit.GetSelected()
 						break exitSelection
@@ -65,7 +61,6 @@ func (r *Player) Update(delta float64, game *Game) {
 		}
 	}
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButton1) {
-		fmt.Println("pressed 1, middle click")
 		mx, my := game.MousePos()
 		wx, wy := game.ScreenPosToWorldPos(mx, my)
 		for _, u := range game.units {
@@ -78,7 +73,6 @@ func (r *Player) Update(delta float64, game *Game) {
 
 	}
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButton2) {
-		fmt.Println("pressed 2, right click")
 		if game.selectedUnit != nil {
 			game.selectedUnit.GetDeSelected()
 		}

@@ -106,18 +106,20 @@ func (r *Soldier) SetTarget(x, y float64) {
 	r.ty = y
 }
 
+var bloodimages = []string{"blood-1", "blood-2"}
+
 func (r *Soldier) Die(game *Game) {
 	if r.state == "die" {
 		return
 	}
 	r.state = "die"
 
-	bloodImage := []string{"blood-1", "blood-2"}[rand.Intn(2)]
+	bloodImage := bloodimages[rand.Intn(2)]
 	game.AddDecor(&Decor{
 		x:         r.x,
 		y:         r.y,
-		z:         forgroundLayer + 10,
-		animation: NewAnimation(game.images[bloodImage], 7, 0.1, 16, true),
+		z:         forgroundLayer,
+		animation: NewAnimation(game.images[bloodImage], 6, 0.1, 20, true),
 	})
 	game.AddDecor(&Decor{
 		x:         r.x,
