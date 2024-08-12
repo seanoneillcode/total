@@ -2,6 +2,7 @@ package core
 
 import (
 	"image"
+	"math/rand"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -24,6 +25,7 @@ func NewAnimation(image *ebiten.Image, frames int, timePerFrame float64, size in
 		timePerFrame: timePerFrame,
 		size:         size,
 		oneShot:      oneShot,
+		frame:        rand.Intn(frames),
 	}
 }
 
