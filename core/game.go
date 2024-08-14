@@ -21,6 +21,10 @@ type Game struct {
 	selectedUnit     *Unit
 }
 
+type ResourceBundle struct {
+	unitShadow *ebiten.Image
+}
+
 func NewGame() *Game {
 	r := &Game{
 		images: map[string]*ebiten.Image{
@@ -40,6 +44,7 @@ func NewGame() *Game {
 			"soldier-walk": common.LoadImage("soldier-walk.png"),
 			"soldier-die":  common.LoadImage("soldier-die.png"),
 			"selection":    common.LoadImage("selection.png"),
+			"unit-shadow":  common.LoadImage("unit-shadow.png"),
 		},
 		lastUpdateCalled: time.Now(),
 		camera:           NewCamera(),
@@ -114,7 +119,7 @@ func (r *Game) Draw(screen *ebiten.Image) {
 	}
 	screen.Fill(backgroundColor)
 	r.camera.screen = screen
-	common.DrawText(screen, "hello", 60, 120)
+	common.DrawText(screen, "tactics game prototype", 16, 8)
 
 	for _, d := range r.decors {
 		d.Draw(r.camera)

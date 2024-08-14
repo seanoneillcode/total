@@ -13,6 +13,7 @@ type Player struct {
 	speed     float64
 	animation *Animation
 	isFlip    bool
+	shadow    *ebiten.Image
 }
 
 func NewPlayer(game *Game) *Player {
@@ -21,6 +22,7 @@ func NewPlayer(game *Game) *Player {
 		x:         0,
 		speed:     0.5,
 		animation: NewAnimation(game.images["player"], 4, 0.2, 16, false),
+		shadow:    game.images["unit-shadow"],
 	}
 	return p
 }
@@ -49,7 +51,7 @@ func (r *Player) Update(delta float64, game *Game) {
 		exitSelection:
 			for _, u := range game.units {
 				for _, s := range u.soldiers {
-					if common.Overlap(s.x+1, s.y+1, 12, wx+3, wy+3, 2) {
+					if common.Overlap(s.x, s.y, 16, wx+3, wy+3, 2) {
 						game.selectedUnit = u
 						game.selectedUnit.GetSelected()
 						break exitSelection
@@ -81,7 +83,7 @@ func (r *Player) Update(delta float64, game *Game) {
 }
 
 func (r *Player) Draw(camera *Camera) {
-	camera.DrawCircle(r.x+8, r.y+14, 6)
+	// camera.DrawCircle(r.x+8, r.y+14, 6)
 	op := &ebiten.DrawImageOptions{}
 	if r.isFlip {
 		op.GeoM.Scale(-1, 1)
@@ -91,4 +93,11 @@ func (r *Player) Draw(camera *Camera) {
 		op.GeoM.Translate(16, 0)
 	}
 	camera.DrawImage(r.animation.GetImage(), op, midgroundLayer)
+	op = &ebiten.DrawImageOptions{}
+	op.GeoM.Translate(r.x-1, r.y+6)
+	if r.isFlip {
+		op.GeoM.Translate(2, 0)
+	}
+	op.ColorScale.ScaleAlpha(0.5)
+	camera.DrawImage(r.shadow, op, midgroundLayer-1)
 }

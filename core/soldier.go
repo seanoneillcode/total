@@ -19,6 +19,7 @@ type Soldier struct {
 	state      string
 	isSelected bool
 	selection  *Animation
+	shadow     *ebiten.Image
 }
 
 func NewSoldier(game *Game, x float64, y float64) *Soldier {
@@ -29,6 +30,7 @@ func NewSoldier(game *Game, x float64, y float64) *Soldier {
 			"die":  NewAnimation(game.images["soldier-die"], 4, 0.2, 16, true),
 		},
 		selection: NewAnimation(game.images["selection"], 2, 0.2, 16, false),
+		shadow:    game.images["unit-shadow"],
 		x:         x,
 		y:         y,
 		tx:        x,
@@ -81,7 +83,7 @@ func (r *Soldier) Draw(camera *Camera) {
 	if r.state == "die" {
 		return
 	}
-	camera.DrawCircle(r.x+8, r.y+14, 5)
+	// camera.DrawCircle(r.x+8, r.y+14, 5)
 	op := &ebiten.DrawImageOptions{}
 	if r.isFlip {
 		op.GeoM.Scale(-1, 1)
@@ -92,6 +94,11 @@ func (r *Soldier) Draw(camera *Camera) {
 	}
 	animation := r.animations[r.state]
 	camera.DrawImage(animation.GetImage(), op, midgroundLayer)
+
+	op = &ebiten.DrawImageOptions{}
+	op.GeoM.Translate(r.x, r.y+5)
+	op.ColorScale.ScaleAlpha(0.5)
+	camera.DrawImage(r.shadow, op, midgroundLayer-1)
 
 	if r.isSelected {
 		op = &ebiten.DrawImageOptions{}
