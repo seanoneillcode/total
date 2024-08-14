@@ -19,10 +19,7 @@ type Game struct {
 	decors           []*Decor
 	units            []*Unit
 	selectedUnit     *Unit
-}
-
-type ResourceBundle struct {
-	unitShadow *ebiten.Image
+	resources        map[string]UnitResource
 }
 
 func NewGame() *Game {
@@ -45,9 +42,12 @@ func NewGame() *Game {
 			"soldier-die":  common.LoadImage("soldier-die.png"),
 			"selection":    common.LoadImage("selection.png"),
 			"unit-shadow":  common.LoadImage("unit-shadow.png"),
+			"archer-idle":  common.LoadImage("archer-idle.png"),
+			"horse":        common.LoadImage("horse.png"),
 		},
 		lastUpdateCalled: time.Now(),
 		camera:           NewCamera(),
+		resources:        unitResources,
 	}
 	r.player = NewPlayer(r)
 	r.decors = []*Decor{}
@@ -66,13 +66,13 @@ func NewGame() *Game {
 		NewUnit(r),
 	}
 	for i := 0; i < 8; i++ {
-		r.units[0].AddSoldier(NewSoldier(r, 0, 0))
+		r.units[0].AddSoldier(NewSoldier(r, 0, 0, "blue-soldier", 16))
 	}
 	for i := 0; i < 18; i++ {
-		r.units[1].AddSoldier(NewSoldier(r, 0, 0))
+		r.units[1].AddSoldier(NewSoldier(r, 0, 0, "red-archer", 16))
 	}
 	for i := 0; i < 4; i++ {
-		r.units[2].AddSoldier(NewSoldier(r, 0, 0))
+		r.units[2].AddSoldier(NewSoldier(r, 0, 0, "red-knight", 32))
 	}
 
 	r.units[0].MoveTo(-40, -60)

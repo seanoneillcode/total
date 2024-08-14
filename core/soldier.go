@@ -13,6 +13,9 @@ type Soldier struct {
 	y          float64
 	tx         float64
 	ty         float64
+	offsetx    float64
+	offsety    float64
+	size       float64
 	speed      float64
 	isFlip     bool
 	animations map[string]*Animation
@@ -22,12 +25,12 @@ type Soldier struct {
 	shadow     *ebiten.Image
 }
 
-func NewSoldier(game *Game, x float64, y float64) *Soldier {
+func NewSoldier(game *Game, x float64, y float64, soldierType string, size int) *Soldier {
 	return &Soldier{
 		animations: map[string]*Animation{
-			"idle": NewAnimation(game.images["soldier-idle"], 4, 0.2, 16, false),
-			"walk": NewAnimation(game.images["soldier-walk"], 4, 0.2, 16, false),
-			"die":  NewAnimation(game.images["soldier-die"], 4, 0.2, 16, true),
+			"idle": NewAnimation(game.images[game.resources[soldierType].Idle], 4, 0.2, size, false),
+			"walk": NewAnimation(game.images[game.resources[soldierType].Walk], 4, 0.2, size, false),
+			"die":  NewAnimation(game.images[game.resources[soldierType].Die], 4, 0.2, size, true),
 		},
 		selection: NewAnimation(game.images["selection"], 2, 0.2, 16, false),
 		shadow:    game.images["unit-shadow"],
@@ -35,7 +38,10 @@ func NewSoldier(game *Game, x float64, y float64) *Soldier {
 		y:         y,
 		tx:        x,
 		ty:        y,
-		speed:     0.5,
+		offsetx:   float64(size / 2),
+		offsety:   float64(size - 2),
+		size:      float64(size),
+		speed:     0.4,
 		state:     "idle",
 	}
 }
@@ -83,26 +89,26 @@ func (r *Soldier) Draw(camera *Camera) {
 	if r.state == "die" {
 		return
 	}
-	// camera.DrawCircle(r.x+8, r.y+14, 5)
 	op := &ebiten.DrawImageOptions{}
 	if r.isFlip {
 		op.GeoM.Scale(-1, 1)
 	}
-	op.GeoM.Translate(r.x, r.y)
+
+	op.GeoM.Translate(r.x-r.offsetx, r.y-r.offsety)
 	if r.isFlip {
-		op.GeoM.Translate(16, 0)
+		op.GeoM.Translate(r.size, 0)
 	}
 	animation := r.animations[r.state]
 	camera.DrawImage(animation.GetImage(), op, midgroundLayer)
 
 	op = &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(r.x, r.y+5)
+	op.GeoM.Translate(r.x-8, r.y-8)
 	op.ColorScale.ScaleAlpha(0.5)
 	camera.DrawImage(r.shadow, op, midgroundLayer-1)
 
 	if r.isSelected {
 		op = &ebiten.DrawImageOptions{}
-		op.GeoM.Translate(r.x, r.y+4)
+		op.GeoM.Translate(r.x-8, r.y-8)
 		op.ColorScale.ScaleAlpha(0.5)
 		camera.DrawImage(r.selection.GetImage(), op, midgroundLayer-50)
 	}
@@ -132,6 +138,6 @@ func (r *Soldier) Die(game *Game) {
 		x:         r.x,
 		y:         r.y,
 		z:         midgroundLayer,
-		animation: NewAnimation(game.images["soldier-die"], 4, 0.2, 16, true),
+		animation: r.animations["die"],
 	})
 }
