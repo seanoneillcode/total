@@ -20,7 +20,7 @@ type Unit struct {
 
 func NewUnit(game *Game) *Unit {
 	return &Unit{
-		targetMarker: NewAnimation(game.images["selection"], 2, 0.2, 16, false),
+		targetMarker: NewAnimation(game.resources.GetImage("selection"), 2, 0.2, 16, false),
 		soldiers:     []*Soldier{},
 	}
 }

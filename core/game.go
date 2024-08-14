@@ -13,41 +13,19 @@ import (
 type Game struct {
 	lastUpdateCalled time.Time
 	player           *Player
-	images           map[string]*ebiten.Image
 	camera           *Camera
 	cursor           *Cursor
 	decors           []*Decor
 	units            []*Unit
 	selectedUnit     *Unit
-	resources        map[string]UnitResource
+	resources        *Resources
 }
 
 func NewGame() *Game {
 	r := &Game{
-		images: map[string]*ebiten.Image{
-			// load all the images once, up front
-			"player":       common.LoadImage("player.png"),
-			"player-walk":  common.LoadImage("player-walk.png"),
-			"player-die":   common.LoadImage("player-die.png"),
-			"grass-1":      common.LoadImage("grass-1.png"),
-			"grass-2":      common.LoadImage("grass-2.png"),
-			"grass-3":      common.LoadImage("grass-3.png"),
-			"grass-4":      common.LoadImage("grass-4.png"),
-			"blood-1":      common.LoadImage("blood-1.png"),
-			"blood-2":      common.LoadImage("blood-2.png"),
-			"cursor":       common.LoadImage("cursor.png"),
-			"cursor-move":  common.LoadImage("cursor-move.png"),
-			"soldier-idle": common.LoadImage("soldier-idle.png"),
-			"soldier-walk": common.LoadImage("soldier-walk.png"),
-			"soldier-die":  common.LoadImage("soldier-die.png"),
-			"selection":    common.LoadImage("selection.png"),
-			"unit-shadow":  common.LoadImage("unit-shadow.png"),
-			"archer-idle":  common.LoadImage("archer-idle.png"),
-			"horse":        common.LoadImage("horse.png"),
-		},
 		lastUpdateCalled: time.Now(),
 		camera:           NewCamera(),
-		resources:        unitResources,
+		resources:        NewResources(),
 	}
 	r.player = NewPlayer(r)
 	r.decors = []*Decor{}
@@ -56,7 +34,7 @@ func NewGame() *Game {
 		r.decors = append(r.decors, &Decor{
 			x:         float64(rand.Intn(common.ScreenWidth*2) - common.ScreenWidth),
 			y:         float64(rand.Intn(common.ScreenHeight*2) - common.ScreenHeight),
-			animation: NewAnimation(r.images[grassImageNames[rand.Intn(4)]], 4, 0.2, 16, false),
+			animation: NewAnimation(r.resources.GetImage(grassImageNames[rand.Intn(4)]), 4, 0.2, 16, false),
 		})
 	}
 	r.cursor = NewCursor(r)

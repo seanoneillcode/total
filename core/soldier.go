@@ -26,14 +26,15 @@ type Soldier struct {
 }
 
 func NewSoldier(game *Game, x float64, y float64, soldierType string, size int) *Soldier {
+	unitRes := game.resources.GetUnitResource(soldierType)
 	return &Soldier{
 		animations: map[string]*Animation{
-			"idle": NewAnimation(game.images[game.resources[soldierType].Idle], 4, 0.2, size, false),
-			"walk": NewAnimation(game.images[game.resources[soldierType].Walk], 4, 0.2, size, false),
-			"die":  NewAnimation(game.images[game.resources[soldierType].Die], 4, 0.2, size, true),
+			"idle": NewAnimation(game.resources.GetImage(unitRes.Idle), 4, 0.2, size, false),
+			"walk": NewAnimation(game.resources.GetImage(unitRes.Walk), 4, 0.2, size, false),
+			"die":  NewAnimation(game.resources.GetImage(unitRes.Die), 4, 0.2, size, true),
 		},
-		selection: NewAnimation(game.images["selection"], 2, 0.2, 16, false),
-		shadow:    game.images["unit-shadow"],
+		selection: NewAnimation(game.resources.GetImage("selection"), 2, 0.2, 16, false),
+		shadow:    game.resources.GetImage("unit-shadow"),
 		x:         x,
 		y:         y,
 		tx:        x,
@@ -132,7 +133,7 @@ func (r *Soldier) Die(game *Game) {
 		x:         r.x,
 		y:         r.y,
 		z:         forgroundLayer,
-		animation: NewAnimation(game.images[bloodImage], 6, 0.1, 20, true),
+		animation: NewAnimation(game.resources.GetImage(bloodImage), 6, 0.1, 20, true),
 	})
 	game.AddDecor(&Decor{
 		x:         r.x,

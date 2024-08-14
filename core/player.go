@@ -21,8 +21,8 @@ func NewPlayer(game *Game) *Player {
 		y:         0,
 		x:         0,
 		speed:     0.5,
-		animation: NewAnimation(game.images["player"], 4, 0.2, 16, false),
-		shadow:    game.images["unit-shadow"],
+		animation: NewAnimation(game.resources.GetImage("player"), 4, 0.2, 16, false),
+		shadow:    game.resources.GetImage("unit-shadow"),
 	}
 	return p
 }

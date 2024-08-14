@@ -19,6 +19,9 @@ type Animation struct {
 }
 
 func NewAnimation(image *ebiten.Image, frames int, timePerFrame float64, size int, oneShot bool) *Animation {
+	if image == nil {
+		panic("nil image")
+	}
 	return &Animation{
 		image:        image,
 		frames:       frames,
