@@ -19,6 +19,7 @@ type Game struct {
 	units            []*Unit
 	selectedUnit     *Unit
 	resources        *Resources
+	stats            *Stats
 }
 
 func NewGame() *Game {
@@ -26,6 +27,7 @@ func NewGame() *Game {
 		lastUpdateCalled: time.Now(),
 		camera:           NewCamera(),
 		resources:        NewResources(),
+		stats:            NewStats(),
 	}
 	r.player = NewPlayer(r)
 	r.decors = []*Decor{}

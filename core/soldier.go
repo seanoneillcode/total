@@ -24,9 +24,11 @@ type Soldier struct {
 	selection  *Animation
 	shadow     *ebiten.Image
 	unitRes    UnitResource
+	unitStats  UnitStats
 }
 
 func NewSoldier(game *Game, x float64, y float64, soldierType string) *Soldier {
+	stats := game.stats.GetUnitStats(soldierType)
 	unitRes := game.resources.GetUnitResource(soldierType)
 	return &Soldier{
 		animations: map[string]*Animation{
@@ -42,9 +44,10 @@ func NewSoldier(game *Game, x float64, y float64, soldierType string) *Soldier {
 		offsetx:   float64(unitRes.Size / 2),
 		offsety:   float64(unitRes.Size - 2),
 		size:      float64(unitRes.Size),
-		speed:     0.4,
+		speed:     stats.Speed,
 		state:     "idle",
 		unitRes:   unitRes,
+		unitStats: stats,
 	}
 }
 
