@@ -22,13 +22,17 @@ func NewAnimation(image *ebiten.Image, frames int, timePerFrame float64, size in
 	if image == nil {
 		panic("nil image")
 	}
+	startFrame := 0
+	if !oneShot {
+		startFrame = rand.Intn(frames)
+	}
 	return &Animation{
 		image:        image,
 		frames:       frames,
 		timePerFrame: timePerFrame,
 		size:         size,
 		oneShot:      oneShot,
-		frame:        rand.Intn(frames),
+		frame:        startFrame,
 	}
 }
 

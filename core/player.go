@@ -51,8 +51,7 @@ func (r *Player) Update(delta float64, game *Game) {
 		exitSelection:
 			for _, u := range game.units {
 				for _, s := range u.soldiers {
-					piSize := s.size / 3
-					if common.Overlap(s.x-piSize, s.y-piSize, piSize*2, wx+7, wy+7, 2) {
+					if isSoldierClicked(s, wx, wy) {
 						game.selectedUnit = u
 						game.selectedUnit.GetSelected()
 						break exitSelection
@@ -68,7 +67,7 @@ func (r *Player) Update(delta float64, game *Game) {
 		wx, wy := game.ScreenPosToWorldPos(mx, my)
 		for _, u := range game.units {
 			for _, s := range u.soldiers {
-				if common.Overlap(s.x, s.y, 16, wx+4, wy+4, 1) {
+				if isSoldierClicked(s, wx, wy) {
 					s.Die(game)
 				}
 			}
@@ -81,6 +80,11 @@ func (r *Player) Update(delta float64, game *Game) {
 		}
 		game.selectedUnit = nil
 	}
+}
+
+func isSoldierClicked(s *Soldier, wx float64, wy float64) bool {
+	piSize := s.size / 3
+	return common.Overlap(s.x-piSize, s.y-piSize, piSize*2, wx+7, wy+7, 2)
 }
 
 func (r *Player) Draw(camera *Camera) {

@@ -23,33 +23,33 @@ type Soldier struct {
 	isSelected bool
 	selection  *Animation
 	shadow     *ebiten.Image
+	unitRes    UnitResource
 }
 
-func NewSoldier(game *Game, x float64, y float64, soldierType string, size int) *Soldier {
+func NewSoldier(game *Game, x float64, y float64, soldierType string) *Soldier {
 	unitRes := game.resources.GetUnitResource(soldierType)
 	return &Soldier{
 		animations: map[string]*Animation{
-			"idle": NewAnimation(game.resources.GetImage(unitRes.Idle), 4, 0.2, size, false),
-			"walk": NewAnimation(game.resources.GetImage(unitRes.Walk), 4, 0.2, size, false),
-			"die":  NewAnimation(game.resources.GetImage(unitRes.Die), 4, 0.2, size, true),
+			"idle": NewAnimation(game.resources.GetImage(unitRes.Idle), 4, 0.2, unitRes.Size, false),
+			"walk": NewAnimation(game.resources.GetImage(unitRes.Walk), 4, 0.2, unitRes.Size, false),
 		},
-		selection: NewAnimation(game.resources.GetImage("selection"), 2, 0.2, 16, false),
+		selection: NewAnimation(game.resources.GetImage("selection"), 1, 0.2, 16, false),
 		shadow:    game.resources.GetImage("unit-shadow"),
 		x:         x,
 		y:         y,
 		tx:        x,
 		ty:        y,
-		offsetx:   float64(size / 2),
-		offsety:   float64(size - 2),
-		size:      float64(size),
+		offsetx:   float64(unitRes.Size / 2),
+		offsety:   float64(unitRes.Size - 2),
+		size:      float64(unitRes.Size),
 		speed:     0.4,
 		state:     "idle",
+		unitRes:   unitRes,
 	}
 }
 
 func (r *Soldier) Update(delta float64, game *Game) {
 	if r.state == "die" {
-		r.animations[r.state].Update(delta, game)
 		return
 	}
 	isMoving := false
@@ -130,15 +130,15 @@ func (r *Soldier) Die(game *Game) {
 
 	bloodImage := bloodimages[rand.Intn(2)]
 	game.AddDecor(&Decor{
-		x:         r.x,
-		y:         r.y,
+		x:         r.x - r.offsetx,
+		y:         r.y - r.offsety,
 		z:         forgroundLayer,
 		animation: NewAnimation(game.resources.GetImage(bloodImage), 6, 0.1, 20, true),
 	})
 	game.AddDecor(&Decor{
-		x:         r.x,
-		y:         r.y,
+		x:         r.x - r.offsetx,
+		y:         r.y - r.offsety,
 		z:         midgroundLayer,
-		animation: r.animations["die"],
+		animation: NewAnimation(game.resources.GetImage(r.unitRes.Die), 4, 0.2, int(r.size), true),
 	})
 }

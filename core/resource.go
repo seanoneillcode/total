@@ -52,6 +52,7 @@ type UnitResource struct {
 	Idle string
 	Walk string
 	Die  string
+	Size int
 }
 
 var unitResources = map[string]UnitResource{
@@ -59,25 +60,42 @@ var unitResources = map[string]UnitResource{
 		Idle: "soldier-idle",
 		Walk: "soldier-walk",
 		Die:  "soldier-die",
+		Size: 16,
+	},
+	"blue-archer": {
+		Idle: "archer-idle-blue",
+		Walk: "archer-walk-blue",
+		Die:  "archer-die-blue",
+		Size: 16,
 	},
 	"red-soldier": {
 		Idle: "soldier-idle",
 		Walk: "soldier-walk",
 		Die:  "soldier-die",
+		Size: 16,
 	},
 	"red-archer": {
 		Idle: "archer-idle",
 		Walk: "archer-idle",
 		Die:  "archer-idle",
+		Size: 16,
 	},
 	"red-knight": {
 		Idle: "horse",
 		Walk: "horse",
 		Die:  "horse",
+		Size: 32,
+	},
+	"wizard": {
+		Idle: "bishop-idle",
+		Walk: "bishop-walk",
+		Die:  "bishop-die",
+		Size: 16,
 	},
 	"thug": {
 		Idle: "thug",
 		Walk: "thug",
 		Die:  "thug",
+		Size: 16,
 	},
 }
