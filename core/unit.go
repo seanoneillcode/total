@@ -1,27 +1,39 @@
 package core
 
 import (
+	"github.com/hajimehoshi/ebiten/v2"
+	"image"
 	"math"
 	"total/common"
-
-	"github.com/hajimehoshi/ebiten/v2"
 )
 
 const SelectionTime = 1.0
 
 type Unit struct {
-	x              float64
-	y              float64
-	soldiers       []*Soldier
-	unitTemplate   *UnitTemplate
-	targetMarker   *Animation
-	selectionTimer float64
+	x            float64
+	y            float64
+	soldiers     []*Soldier
+	unitTemplate *UnitTemplate
+	bannerTop    *Decor
+	bannerBottom *Decor
 }
 
 func NewUnit(game *Game) *Unit {
+	top := ebiten.NewImageFromImage(game.resources.GetImage("banner").SubImage(image.Rect(0, 0, 64, 16)))
+	bottom := ebiten.NewImageFromImage(game.resources.GetImage("banner").SubImage(image.Rect(0, 16, 64, 32)))
+	topAnim := NewAnimation(top, 4, 0.4, 16, false)
+	bottomAnim := NewAnimation(bottom, 4, 0.4, 16, false)
+	bottomAnim.frame = topAnim.frame
 	return &Unit{
-		targetMarker: NewAnimation(game.resources.GetImage("selection"), 2, 0.2, 16, false),
-		soldiers:     []*Soldier{},
+		soldiers: []*Soldier{},
+		bannerTop: &Decor{
+			z:         midgroundLayer + 10,
+			animation: topAnim,
+		},
+		bannerBottom: &Decor{
+			z:         midgroundLayer,
+			animation: bottomAnim,
+		},
 	}
 }
 
@@ -70,7 +82,10 @@ func (u *Unit) MoveTo(x, y float64) {
 	}
 	u.x = x
 	u.y = y
-	u.selectionTimer = SelectionTime
+	u.bannerTop.x = x
+	u.bannerTop.y = y - 32 + 8
+	u.bannerBottom.x = x
+	u.bannerBottom.y = y - 8
 }
 
 func (u *Unit) Update(delta float64, game *Game) {
@@ -81,9 +96,7 @@ func (u *Unit) Update(delta float64, game *Game) {
 			needsClearing = true
 		}
 	}
-	if u.selectionTimer > 0 {
-		u.selectionTimer = u.selectionTimer - delta
-	}
+
 	if needsClearing {
 		newSlice := []*Soldier{}
 		for _, s := range u.soldiers {
@@ -93,27 +106,20 @@ func (u *Unit) Update(delta float64, game *Game) {
 		}
 		u.soldiers = newSlice
 	}
+	u.bannerTop.animation.Update(delta, game)
+	u.bannerBottom.animation.Update(delta, game)
 }
 
 func (u *Unit) Draw(camera *Camera) {
 	for _, s := range u.soldiers {
 		s.Draw(camera)
-		u.drawSelection(camera, s.tx, s.ty)
 	}
+	u.bannerTop.Draw(camera)
+	u.bannerBottom.Draw(camera)
 }
 
 type UnitTemplate struct {
 	pos map[int]Soldier
-}
-
-func (u *Unit) drawSelection(camera *Camera, x float64, y float64) {
-	if u.selectionTimer <= 0 {
-		return
-	}
-	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(x, y)
-	op.ColorScale.ScaleAlpha(float32(u.selectionTimer) / SelectionTime)
-	camera.DrawImage(u.targetMarker.GetImage(), op, midgroundLayer-50)
 }
 
 func (u *Unit) GetSelected() {

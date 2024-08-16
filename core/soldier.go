@@ -9,22 +9,23 @@ import (
 )
 
 type Soldier struct {
-	x          float64
-	y          float64
-	tx         float64
-	ty         float64
-	offsetx    float64
-	offsety    float64
-	size       float64
-	speed      float64
-	isFlip     bool
-	animations map[string]*Animation
-	state      string
-	isSelected bool
-	selection  *Animation
-	shadow     *ebiten.Image
-	unitRes    UnitResource
-	unitStats  UnitStats
+	x              float64
+	y              float64
+	tx             float64
+	ty             float64
+	offsetx        float64
+	offsety        float64
+	size           float64
+	speed          float64
+	isFlip         bool
+	animations     map[string]*Animation
+	state          string
+	isSelected     bool
+	selection      *ebiten.Image
+	shadow         *ebiten.Image
+	unitRes        UnitResource
+	unitStats      UnitStats
+	selectionTimer float64
 }
 
 func NewSoldier(game *Game, x float64, y float64, soldierType string) *Soldier {
@@ -35,7 +36,7 @@ func NewSoldier(game *Game, x float64, y float64, soldierType string) *Soldier {
 			"idle": NewAnimation(game.resources.GetImage(unitRes.Idle), 4, 0.2, unitRes.Size, false),
 			"walk": NewAnimation(game.resources.GetImage(unitRes.Walk), 4, 0.2, unitRes.Size, false),
 		},
-		selection: NewAnimation(game.resources.GetImage("selection"), 1, 0.2, 16, false),
+		selection: game.resources.GetImage("selection"),
 		shadow:    game.resources.GetImage("unit-shadow"),
 		x:         x,
 		y:         y,
@@ -54,6 +55,9 @@ func NewSoldier(game *Game, x float64, y float64, soldierType string) *Soldier {
 func (r *Soldier) Update(delta float64, game *Game) {
 	if r.state == "die" {
 		return
+	}
+	if r.selectionTimer > 0 {
+		r.selectionTimer = r.selectionTimer - delta
 	}
 	isMoving := false
 	if math.Abs(r.tx-r.x) < (2 * r.speed) {
@@ -93,6 +97,7 @@ func (r *Soldier) Draw(camera *Camera) {
 	if r.state == "die" {
 		return
 	}
+	r.drawTarget(camera)
 	op := &ebiten.DrawImageOptions{}
 	if r.isFlip {
 		op.GeoM.Scale(-1, 1)
@@ -114,13 +119,14 @@ func (r *Soldier) Draw(camera *Camera) {
 		op = &ebiten.DrawImageOptions{}
 		op.GeoM.Translate(r.x-8, r.y-8)
 		op.ColorScale.ScaleAlpha(0.5)
-		camera.DrawImage(r.selection.GetImage(), op, midgroundLayer-50)
+		camera.DrawImage(r.selection, op, midgroundLayer-50)
 	}
 }
 
 func (r *Soldier) SetTarget(x, y float64) {
 	r.tx = x
 	r.ty = y
+	r.selectionTimer = SelectionTime
 }
 
 var bloodimages = []string{"blood-1", "blood-2"}
@@ -144,4 +150,14 @@ func (r *Soldier) Die(game *Game) {
 		z:         midgroundLayer,
 		animation: NewAnimation(game.resources.GetImage(r.unitRes.Die), 4, 0.2, int(r.size), true),
 	})
+}
+
+func (r *Soldier) drawTarget(camera *Camera) {
+	if r.selectionTimer <= 0 {
+		return
+	}
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Translate(r.tx, r.ty)
+	op.ColorScale.ScaleAlpha(float32(r.selectionTimer) / SelectionTime)
+	camera.DrawImage(r.selection, op, midgroundLayer-50)
 }
