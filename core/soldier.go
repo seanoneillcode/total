@@ -33,8 +33,8 @@ func NewSoldier(game *Game, x float64, y float64, soldierType string) *Soldier {
 	unitRes := game.resources.GetUnitResource(soldierType)
 	return &Soldier{
 		animations: map[string]*Animation{
-			"idle": NewAnimation(game.resources.GetImage(unitRes.Idle), 4, 0.2, unitRes.Size, false),
-			"walk": NewAnimation(game.resources.GetImage(unitRes.Walk), 4, 0.2, unitRes.Size, false),
+			"idle": NewAnimation(game.resources.GetImage(unitRes.Idle), 4, 0.1, unitRes.Size, false),
+			"walk": NewAnimation(game.resources.GetImage(unitRes.Walk), 4, 0.1, unitRes.Size, false),
 		},
 		selection: game.resources.GetImage("selection"),
 		shadow:    game.resources.GetImage("unit-shadow"),
@@ -127,6 +127,13 @@ func (r *Soldier) SetTarget(x, y float64) {
 	r.tx = x
 	r.ty = y
 	r.selectionTimer = SelectionTime
+}
+
+func (r *Soldier) SetPosition(x, y float64) {
+	r.tx = x
+	r.ty = y
+	r.x = x
+	r.y = y
 }
 
 var bloodimages = []string{"blood-1", "blood-2"}

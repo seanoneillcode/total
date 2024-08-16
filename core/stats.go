@@ -28,6 +28,12 @@ func NewStats() *Stats {
 			"wizard": {
 				Speed: 0.2,
 			},
+			"dwarf": {
+				Speed: 0.35,
+			},
+			"goblin": {
+				Speed: 0.6,
+			},
 		},
 	}
 }

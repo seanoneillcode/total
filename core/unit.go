@@ -12,19 +12,20 @@ const SelectionTime = 1.0
 type Unit struct {
 	x            float64
 	y            float64
+	unitSpacing  float64
 	soldiers     []*Soldier
 	unitTemplate *UnitTemplate
 	bannerTop    *Decor
 	bannerBottom *Decor
 }
 
-func NewUnit(game *Game) *Unit {
+func NewUnit(game *Game, soldierType string, numSoldiers int, unitSpacing float64) *Unit {
 	top := ebiten.NewImageFromImage(game.resources.GetImage("banner").SubImage(image.Rect(0, 0, 64, 16)))
 	bottom := ebiten.NewImageFromImage(game.resources.GetImage("banner").SubImage(image.Rect(0, 16, 64, 32)))
 	topAnim := NewAnimation(top, 4, 0.4, 16, false)
 	bottomAnim := NewAnimation(bottom, 4, 0.4, 16, false)
 	bottomAnim.frame = topAnim.frame
-	return &Unit{
+	u := &Unit{
 		soldiers: []*Soldier{},
 		bannerTop: &Decor{
 			z:         midgroundLayer + 10,
@@ -34,11 +35,26 @@ func NewUnit(game *Game) *Unit {
 			z:         midgroundLayer,
 			animation: bottomAnim,
 		},
+		unitSpacing: unitSpacing,
 	}
+	for i := 0; i < numSoldiers; i++ {
+		u.AddSoldier(NewSoldier(game, 0, 0, soldierType))
+	}
+	return u
 }
 
 func (u *Unit) AddSoldier(soldier *Soldier) {
 	u.soldiers = append(u.soldiers, soldier)
+}
+
+func (u *Unit) SetPosition(x, y float64) {
+	u.setSoldierPositions(x, y, false)
+	u.x = x
+	u.y = y
+	u.bannerTop.x = x
+	u.bannerTop.y = y - 32 + 8
+	u.bannerBottom.x = x
+	u.bannerBottom.y = y - 8
 }
 
 // set the template as the target
@@ -46,6 +62,18 @@ func (u *Unit) MoveTo(x, y float64) {
 	if x == u.x && y == u.y {
 		return
 	}
+	u.setSoldierPositions(x, y, true)
+	u.x = x
+	u.y = y
+	u.bannerTop.x = x
+	u.bannerTop.y = y - 32 + 8
+	u.bannerBottom.x = x
+	u.bannerBottom.y = y - 8
+}
+
+func (u *Unit) setSoldierPositions(x, y float64, isTarget bool) {
+	unitSize := u.unitSpacing
+
 	// calculate the direction
 	dirx := x - u.x
 	diry := y - u.y
@@ -63,29 +91,27 @@ func (u *Unit) MoveTo(x, y float64) {
 	column := row
 
 	// target pos is the top left, should be middle
-	px := x - ((float64(column/2) - 0.5) * rxdir * 16)
-	py := y - ((float64(column/2) - 0.5) * rydir * 16)
+	px := x - ((float64(column/2) - 0.5) * rxdir * unitSize)
+	py := y - ((float64(column/2) - 0.5) * rydir * unitSize)
 	tx := px
 	ty := py
 
 	index := 0
 	// the unit is square for now
 	for i := 0; i < row && index < total; i++ {
-		tx = px + (float64(i) * (16 * -dirx))
-		ty = py + (float64(i) * (16 * -diry))
+		tx = px + (float64(i) * (unitSize * -dirx))
+		ty = py + (float64(i) * (unitSize * -diry))
 		for j := 0; j < column && index < total; j++ {
-			u.soldiers[index].SetTarget(tx, ty)
-			tx = tx + (rxdir * 16)
-			ty = ty + (rydir * 16)
+			if isTarget {
+				u.soldiers[index].SetTarget(tx, ty)
+			} else {
+				u.soldiers[index].SetPosition(tx, ty)
+			}
+			tx = tx + (rxdir * unitSize)
+			ty = ty + (rydir * unitSize)
 			index++
 		}
 	}
-	u.x = x
-	u.y = y
-	u.bannerTop.x = x
-	u.bannerTop.y = y - 32 + 8
-	u.bannerBottom.x = x
-	u.bannerBottom.y = y - 8
 }
 
 func (u *Unit) Update(delta float64, game *Game) {

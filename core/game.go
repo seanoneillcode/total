@@ -41,28 +41,20 @@ func NewGame() *Game {
 	}
 	r.cursor = NewCursor(r)
 	r.units = []*Unit{
-		NewUnit(r),
-		NewUnit(r),
-		NewUnit(r),
-		NewUnit(r),
-	}
-	for i := 0; i < 8; i++ {
-		r.units[0].AddSoldier(NewSoldier(r, 0, 0, "blue-soldier"))
-	}
-	for i := 0; i < 18; i++ {
-		r.units[1].AddSoldier(NewSoldier(r, 0, 0, "blue-archer"))
-	}
-	for i := 0; i < 4; i++ {
-		r.units[2].AddSoldier(NewSoldier(r, 0, 0, "red-knight"))
-	}
-	for i := 0; i < 2; i++ {
-		r.units[3].AddSoldier(NewSoldier(r, 0, 0, "wizard"))
+		NewUnit(r, "blue-soldier", 8, 12),
+		NewUnit(r, "blue-archer", 18, 20),
+		NewUnit(r, "red-knight", 4, 24),
+		NewUnit(r, "wizard", 2, 16),
+		NewUnit(r, "dwarf", 16, 16),
+		NewUnit(r, "goblin", 48, 10),
 	}
 
-	r.units[0].MoveTo(-40, -60)
-	r.units[1].MoveTo(-60, 40)
-	r.units[2].MoveTo(30, 30)
-	r.units[3].MoveTo(50, -10)
+	r.units[0].SetPosition(-40, -60)
+	r.units[1].SetPosition(-60, 40)
+	r.units[2].SetPosition(30, 30)
+	r.units[3].SetPosition(50, -10)
+	r.units[4].SetPosition(200, 0)
+	r.units[5].SetPosition(200, 60)
 
 	return r
 }

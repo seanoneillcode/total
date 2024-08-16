@@ -92,6 +92,18 @@ var unitResources = map[string]UnitResource{
 		Die:  "bishop-die",
 		Size: 16,
 	},
+	"dwarf": {
+		Idle: "dwarf-idle",
+		Walk: "dwarf-run",
+		Die:  "dwarf-idle",
+		Size: 24,
+	},
+	"goblin": {
+		Idle: "goblin",
+		Walk: "goblin-walk",
+		Die:  "goblin-die",
+		Size: 16,
+	},
 	"thug": {
 		Idle: "thug",
 		Walk: "thug",
